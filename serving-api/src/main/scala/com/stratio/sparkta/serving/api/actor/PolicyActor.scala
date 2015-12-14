@@ -26,6 +26,7 @@ import com.stratio.sparkta.serving.core.CuratorFactoryHolder
 import com.stratio.sparkta.serving.core.constants.AppConstant
 import com.stratio.sparkta.serving.core.exception.ServingCoreException
 import com.stratio.sparkta.serving.core.models._
+import com.stratio.sparkta.serving.core.policy.status.PolicyStatusActor.Kill
 import com.stratio.sparkta.serving.core.policy.status.{PolicyStatusActor, PolicyStatusEnum}
 import org.apache.curator.framework.CuratorFramework
 import org.apache.zookeeper.KeeperException.NoNodeException
@@ -142,14 +143,18 @@ class PolicyActor(curatorFramework: CuratorFramework, policyStatusActor: ActorRe
   }
 
   def delete(id: String): Unit =
-    sender ! Response(Try({
-      curatorFramework.delete().forPath(s"${AppConstant.PoliciesBasePath}/$id")
-    }).recover {
-      case e: NoNodeException => throw new ServingCoreException(ErrorModel.toString(
-        new ErrorModel(ErrorModel.CodeNotExistsFragmentWithId,
-          s"No policy with id $id.")
-      ))
-    })
+  sender ! Response(Try({
+    val aggregationPolicy = byId(id)
+    policyStatusActor ! PolicyStatusActor.Kill (aggregationPolicy.name)
+    curatorFramework.delete().forPath(s"${AppConstant.PoliciesBasePath}/$id")
+  }).recover {
+    case e: NoNodeException => throw new ServingCoreException(ErrorModel.toString(
+      new ErrorModel(ErrorModel.CodeNotExistsFragmentWithId,
+        s"No policy with id $id.")
+    ))
+  })
+
+
 
   def existsByNameId(name: String, id: Option[String] = None): Option[AggregationPoliciesModel] = {
     val nameToCompare = name.toLowerCase
