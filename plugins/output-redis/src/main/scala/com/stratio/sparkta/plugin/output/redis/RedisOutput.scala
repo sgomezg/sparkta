@@ -43,11 +43,6 @@ class RedisOutput(keyName: String,
 
   override val port = properties.getString("port", DefaultRedisPort).toInt
 
-  override val supportedWriteOps = Seq(WriteOp.Inc, WriteOp.IncBig, WriteOp.Max, WriteOp.Min, WriteOp.Set,
-    WriteOp.Range, WriteOp.Avg, WriteOp.Median, WriteOp.Variance, WriteOp.Stddev, WriteOp.Mode, WriteOp.AccSet,
-    WriteOp.AccAvg, WriteOp.AccMedian, WriteOp.AccStddev, WriteOp.AccVariance, WriteOp.EntityCount, WriteOp.WordCount,
-  WriteOp.FullText)
-
   override def doPersist(stream: DStream[(DimensionValuesTime, MeasuresValues)]): Unit = {
     persistMetricOperation(stream)
   }

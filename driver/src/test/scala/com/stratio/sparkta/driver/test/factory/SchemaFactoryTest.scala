@@ -110,10 +110,10 @@ with MockitoSugar {
       DimensionValue(
         Dimension("minute", "eventKey", "identity", defaultDimension), 1L)),
       timestamp, checkpointGranularity)
-    val aggregations = Map("field" -> Some("value"))
+    val measures = Map("field" -> Some("value"))
     val fixedDimensionsName = Seq("dim2")
     val fixedDimensions = Some(Seq(("dim3", "value3")))
-    val fixedAggregation = Map("agg2" -> Some("2"))
+    val fixedMeasure = Map("agg2" -> Some("2"))
   }
 
 }

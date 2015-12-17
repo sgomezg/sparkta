@@ -58,12 +58,12 @@ abstract class Output(keyName: String,
     case Some(fixDimensions) => fixDimensions.split(FieldsSeparator)
   }
 
-  val fixedMeasure = properties.getString("fixedMeasures", None)
+  val fixedMeasure = properties.getString("fixedMeasure", None)
 
   val fixedMeasures: MeasuresValues =
     if (fixedMeasure.isDefined) {
-      val fixedAggSplited = fixedMeasure.get.split(Output.FixedAggregationSeparator)
-      MeasuresValues(Map(fixedAggSplited.head -> Some(fixedAggSplited.last)))
+      val fixedMeasureSplitted = fixedMeasure.get.split(Output.FixedMeasureSeparator)
+      MeasuresValues(Map(fixedMeasureSplitted.head -> Some(fixedMeasureSplitted.last)))
     } else MeasuresValues(Map.empty)
 
   final val FieldsSeparator = ","
@@ -102,10 +102,10 @@ abstract class Output(keyName: String,
     })
 
   protected def persistDataFrame(stream: DStream[(DimensionValuesTime, MeasuresValues)]): Unit = {
-    stream.map { case (dimensionValuesTime, aggregations) =>
+    stream.map { case (dimensionValuesTime, measures) =>
       AggregateOperations.toKeyRow(
         filterDimensionValueTimeByFixedDimensions(dimensionValuesTime),
-        aggregations,
+        measures,
         fixedMeasures,
         getFixedDimensions(dimensionValuesTime),
         isAutoCalculateId,
@@ -220,8 +220,8 @@ object Output {
   final val ClassSuffix = "Output"
   final val Separator = "_"
   final val Id = "id"
-  final val FixedAggregation = "fixedAggregation"
-  final val FixedAggregationSeparator = ":"
+  final val FixedMeasure = "fixedMeasure"
+  final val FixedMeasureSeparator = ":"
 
   def getFieldType(dateTimeType: TypeOp, fieldName: String, nullable: Boolean): StructField =
     dateTimeType match {
