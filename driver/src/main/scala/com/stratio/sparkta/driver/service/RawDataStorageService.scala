@@ -54,13 +54,13 @@ class RawDataStorageService(sc: SQLContext, path: String) extends Serializable {
    */
   def save(raw: DStream[Event]): DStream[Event] = {
     raw.map(event => RawEvent(DateOperations.millisToTimeStamp(System.currentTimeMillis()), extractRawFromEvent(event)))
-      .foreachRDD(rdd => rdd.toDF()
-        .write
-        .format("parquet")
-        //FIXME when .partitionBy is stable in Spark we can activate this line
-        //.partitionBy("timeStamp")
-        .mode(SaveMode.Append)
-        .save(s"$path"))
+//      .foreachRDD(rdd => rdd.toDF()
+//        .write
+//        .format("parquet")
+//        //FIXME when .partitionBy is stable in Spark we can activate this line
+//        //.partitionBy("timeStamp")
+//        .mode(SaveMode.Append)
+//        .save(s"$path"))
     raw
   }
 }
